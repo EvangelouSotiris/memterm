@@ -50,5 +50,10 @@ do
     done
     printf "Disk usage on '/': |$hashtags| ($disk_usg%%)"
     sleep 2
-    clear
-done;
+    for i in {0..1}; do
+        for pc in $(seq 1 100); do
+            echo -ne "$pc%\033[0K\r"
+        done
+        tput cuu 1
+    done
+done
