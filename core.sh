@@ -5,16 +5,17 @@ RED='\033[1;31m'
 YELLOW='\033[1;33m'
 GREEN='\033[1;32m'
 PURPLE='\033[1;35m'
+NC='\033[0m'
 
 print_with_colours() 
 {
     if [ "$1" -gt "70" ]; then
-        printf "${RED}$2: |$3| ($1%%)"
+        printf "${RED}$2: |$3| ($1%%)\n"
     else
         if [ "$1" -gt "50" ]; then
-            printf "${YELLOW}$2: |$3| ($1%%)"
+            printf "${YELLOW}$2: |$3| ($1%%)\n"
         else
-            printf "${GREEN}$2: |$3| ($1%%)"
+            printf "${GREEN}$2: |$3| ($1%%)\n"
         fi
     fi
 }
@@ -37,7 +38,7 @@ print_bars() {
 tput clear
 while true
 do  
-    printf "${PURPLE}############################# Volatile Memory Spaces #############################\n----------------------------------------------------------------------------------\n"
+    printf "${NC}############################ Volatile Memory Spaces ############################\n--------------------------------------------------------------------------------\n"
     # RAM usage
     ram=$(free -m | tail -n +2 | head -n +1)
     total_ram=$(echo $ram | cut -d' ' -f2) 
@@ -52,14 +53,17 @@ do
     # SWAP usage
     swap=$(free -m | tail -1)
     total_swap=$(echo $swap | cut -d' ' -f2)
-    used_swap=$(echo $swap | cut -d' ' -f3)
-    swap_usg=$(echo "scale=3 ; ($used_swap / $total_swap)*100" | bc)
-    swap_usg=$(echo "scale=0 ; $swap_usg/1" | bc)
-    hashtags=$(print_bars "$swap_usg")
-    print_with_colours "$swap_usg" "SWAP usage" "$hashtags"
-    printf "\n\n"
-
-    printf "${PURPLE}########################### Non Volatile Memory Spaces ###########################\n----------------------------------------------------------------------------------\n"
+    if [ "$total_swap" -gt 0 ]; then     
+        used_swap=$(echo $swap | cut -d' ' -f3)
+        swap_usg=$(echo "scale=3 ; ($used_swap / $total_swap)*100" | bc)
+        swap_usg=$(echo "scale=0 ; $swap_usg/1" | bc)
+        hashtags=$(print_bars "$swap_usg")
+        print_with_colours "$swap_usg" "SWAP usage" "$hashtags"
+        printf "\n\n"
+    else
+        printf "${NC}No memory allocated as SWAP space.\n\n"    
+    fi
+    printf "${NC}########################## Non Volatile Memory Spaces ##########################\n--------------------------------------------------------------------------------\n"
     # Disk usage
     clues=""
     ctr=0
@@ -78,7 +82,6 @@ do
     disk_usg=$(echo $clues | rev | tr -d %)
     hashtags=$(print_bars "$disk_usg")
     print_with_colours "$disk_usg" "Disk usage on '/'" "$hashtags"
-    printf "\n\n${PURPLE}----------------------------------------------------------------------------------\n"
     sleep 5
     tput clear
 done
