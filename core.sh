@@ -43,13 +43,20 @@ do
     #printf "${NC}############################ Volatile Memory Spaces ############################\n--------------------------------------------------------------------------------\n"
     if [ "$(uptime | grep days)" == "" ]; then
         if [ "$(uptime | grep min)" == "" ]; then
-            echo outemin
+            uptime=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+1)
+            hours=$(echo $uptime | sed 's/:/\n/g' | head -n+1)
+            minutes=$(echo $uptime | sed 's/:/\n/g' | tail -1)
+            printf "Uptime: $hours hours and $minutes minutes\n\n"
         else
             uptime=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+1)
             printf "Uptime: $(echo $uptime | head)\n\n"
         fi
     else
-        echo nope
+        days=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+1)
+        uptime=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+2 | tail -1)
+        hours=$(echo $uptime | sed 's/:/\n/g' | head -n+1)
+        minutes=$(echo $uptime | sed 's/:/\n/g' | tail -1)
+        printf "Uptime: $days, $hours hours and $minutes minutes\n\n"
     fi
     # RAM usage
     ram=$(free -m | tail -n +2 | head -n +1)
