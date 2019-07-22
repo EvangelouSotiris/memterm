@@ -41,6 +41,16 @@ do
     printf "${NC}$USER@$HOSTNAME - $(date)\n\n"
     printf "Logged in Users: $(who | wc -l)\n\n"
     #printf "${NC}############################ Volatile Memory Spaces ############################\n--------------------------------------------------------------------------------\n"
+    if [ "$(uptime | grep days)" == "" ]; then
+        if [ "$(uptime | grep min)" == "" ]; then
+            echo outemin
+        else
+            uptime=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+1)
+            printf "Uptime: $(echo $uptime | head)\n\n"
+        fi
+    else
+        echo nope
+    fi
     # RAM usage
     ram=$(free -m | tail -n +2 | head -n +1)
     total_ram=$(echo $ram | cut -d' ' -f2) 
