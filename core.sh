@@ -38,7 +38,9 @@ print_bars() {
 tput clear
 while true
 do  
-    printf "${NC}############################ Volatile Memory Spaces ############################\n--------------------------------------------------------------------------------\n"
+    printf "${NC}$USER@$HOSTNAME - $(date)\n\n"
+    printf "Logged in Users: $(who | wc -l)\n\n"
+    #printf "${NC}############################ Volatile Memory Spaces ############################\n--------------------------------------------------------------------------------\n"
     # RAM usage
     ram=$(free -m | tail -n +2 | head -n +1)
     total_ram=$(echo $ram | cut -d' ' -f2) 
@@ -59,11 +61,11 @@ do
         swap_usg=$(echo "scale=0 ; $swap_usg/1" | bc)
         hashtags=$(print_bars "$swap_usg")
         print_with_colours "$swap_usg" "SWAP usage" "$hashtags"
-        printf "\n\n"
+        printf "\n"
     else
-        printf "${NC}No memory allocated as SWAP space.\n\n"    
+        printf "${NC}No memory allocated as SWAP space.\n"    
     fi
-    printf "${NC}########################## Non Volatile Memory Spaces ##########################\n--------------------------------------------------------------------------------\n"
+    #printf "${NC}########################## Non Volatile Memory Spaces ##########################\n--------------------------------------------------------------------------------\n"
     # Disk usage
     clues=""
     ctr=0
