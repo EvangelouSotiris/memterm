@@ -10,12 +10,12 @@ NC='\033[0m'
 print_with_colours() 
 {
     if [ "$1" -gt "70" ]; then
-        printf "${RED}$2: |$3| ($1%%)\n"
+        printf "${RED}$2: |$3| ($1%%)\n${NC}"
     else
         if [ "$1" -gt "50" ]; then
-            printf "${YELLOW}$2: |$3| ($1%%)\n"
+            printf "${YELLOW}$2: |$3| ($1%%)\n${NC}"
         else
-            printf "${GREEN}$2: |$3| ($1%%)\n"
+            printf "${GREEN}$2: |$3| ($1%%)\n${NC}"
         fi
     fi
 }
@@ -37,9 +37,10 @@ print_bars() {
 
 tput clear
 while true
-do  
-    printf "${NC}$USER@$HOSTNAME - $(date)\n\n"
-    printf "Logged in Users: $(who | wc -l)\n\n"
+do
+    printf "System Info\n------------\n"
+    printf "${NC}$USER@$HOSTNAME - $(date)\n"
+    printf "Logged in Users: $(who | wc -l)\n"
     #printf "${NC}############################ Volatile Memory Spaces ############################\n--------------------------------------------------------------------------------\n"
     if [ "$(uptime | grep days)" == "" ]; then
         if [ "$(uptime | grep min)" == "" ]; then
@@ -58,6 +59,7 @@ do
         minutes=$(echo $uptime | sed 's/:/\n/g' | tail -1)
         printf "Uptime: $days, $hours hours and $minutes minutes\n\n"
     fi
+    printf "Memory Info\n-----------\n"
     # RAM usage
     ram=$(free -m | tail -n +2 | head -n +1)
     total_ram=$(echo $ram | cut -d' ' -f2) 
@@ -67,7 +69,6 @@ do
     ram_usg=$(echo "scale=0 ; $ram_usg/1" | bc)
     hashtags=$(print_bars "$ram_usg")
     print_with_colours "$ram_usg" "RAM usage" "$hashtags"
-    printf "\n"
     
     # SWAP usage
     swap=$(free -m | tail -1)
@@ -78,7 +79,6 @@ do
         swap_usg=$(echo "scale=0 ; $swap_usg/1" | bc)
         hashtags=$(print_bars "$swap_usg")
         print_with_colours "$swap_usg" "SWAP usage" "$hashtags"
-        printf "\n"
     else
         printf "${NC}No memory allocated as SWAP space.\n"    
     fi
@@ -101,6 +101,14 @@ do
     disk_usg=$(echo $clues | rev | tr -d %)
     hashtags=$(print_bars "$disk_usg")
     print_with_colours "$disk_usg" "Disk usage on '/'" "$hashtags"
+    
+    printf "\nNetwork Info\n-------------\n"
+    iface=$(ip route | grep via | cut -c13- | sed 's/ /\n/g' | sed -n 3p)
+    printf "Default Interface: "$iface"\n"
+    printf "Private IP: "$(ip a | grep $iface | grep inet | cut -c5- | sed 's/ /\n/g' | sed -n 2p)"\n"
+    printf "Default Gateway: "$(ip route | grep via | cut -c13- | sed 's/ /\n/g' | head -n+1)"\n"
+    pubip=$(curl -s ifconfig.me)
+    printf "Public IP: "$pubip
     sleep 5
     tput clear
 done
