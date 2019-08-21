@@ -57,11 +57,19 @@ do
             printf "Uptime: $(echo $uptime | head)\n\n"
         fi
     else
-        days=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+1)
-        uptime=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+2 | tail -1)
-        hours=$(echo $uptime | sed 's/:/\n/g' | head -n+1)
-        minutes=$(echo $uptime | sed 's/:/\n/g' | tail -1)
-        printf "Uptime: $days, $hours hours and $minutes minutes\n\n"
+        if [ "$(uptime | grep hours)" == "" ]; then
+            days=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+1)
+            uptime=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+2 | tail -1)
+            minutes=$(echo $uptime | sed 's/:/\n/g' | tail -1| sed 's/ min//g')
+            printf "Uptime: $days and $minutes minutes\n\n"
+
+        else
+            days=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+1)
+            uptime=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+2 | tail -1)
+            hours=$(echo $uptime | sed 's/:/\n/g' | head -n+1)
+            minutes=$(echo $uptime | sed 's/:/\n/g' | tail -1)
+            printf "Uptime: $days, $hours hours and $minutes minutes\n\n"
+        fi
     fi
     printf "${CYAN}Memory Info\n-----------\n${NC}"
     # RAM usage
