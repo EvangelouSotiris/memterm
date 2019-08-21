@@ -5,6 +5,7 @@ RED='\033[1;31m'
 YELLOW='\033[1;33m'
 GREEN='\033[1;32m'
 PURPLE='\033[1;35m'
+CYAN='\033[1;36m'
 NC='\033[0m'
 
 print_with_colours() 
@@ -36,12 +37,15 @@ print_bars() {
 }
 
 tput clear
+
+. /etc/os-release
+
 while true
 do
-    printf "System Info\n------------\n"
+    printf "${CYAN}System Info\n------------\n"
     printf "${NC}$USER@$HOSTNAME - $(date)\n"
+    printf "Operating System: $PRETTY_NAME $(uname -m)\n"
     printf "Logged in Users: $(who | wc -l)\n"
-    #printf "${NC}############################ Volatile Memory Spaces ############################\n--------------------------------------------------------------------------------\n"
     if [ "$(uptime | grep days)" == "" ]; then
         if [ "$(uptime | grep min)" == "" ]; then
             uptime=$(uptime | sed 's/up/\n/g' | tail -1 | sed 's/,/\n/g' | head -n+1)
@@ -59,7 +63,7 @@ do
         minutes=$(echo $uptime | sed 's/:/\n/g' | tail -1)
         printf "Uptime: $days, $hours hours and $minutes minutes\n\n"
     fi
-    printf "Memory Info\n-----------\n"
+    printf "${CYAN}Memory Info\n-----------\n${NC}"
     # RAM usage
     ram=$(free -m | tail -n +2 | head -n +1)
     total_ram=$(echo $ram | cut -d' ' -f2) 
@@ -82,7 +86,6 @@ do
     else
         printf "${NC}No memory allocated as SWAP space.\n"    
     fi
-    #printf "${NC}########################## Non Volatile Memory Spaces ##########################\n--------------------------------------------------------------------------------\n"
     # Disk usage
     clues=""
     ctr=0
@@ -102,7 +105,7 @@ do
     hashtags=$(print_bars "$disk_usg")
     print_with_colours "$disk_usg" "Disk usage on '/'" "$hashtags"
     
-    printf "\nNetwork Info\n-------------\n"
+    printf "\n${CYAN}Network Info\n-------------\n${NC}"
     iface=$(ip route | grep via | cut -c13- | sed 's/ /\n/g' | sed -n 3p)
     printf "Default Interface: "$iface"\n"
     printf "Private IP: "$(ip a | grep $iface | grep inet | cut -c5- | sed 's/ /\n/g' | sed -n 2p)"\n"
